@@ -1,0 +1,23 @@
+sudo: required
+langauge: generic
+services:
+  - docker
+
+before_install:
+  - docker build -t trojshawn/react-test -f ./client/Dockerfile.dev ./client
+
+script:
+  - docker run -e CI=true trojshawn/react-test npm test
+
+after_success:
+  - docker build -t trojshawn/multi-client ./client
+  - docker build -t trojshawn/multi-nginx ./nginx
+  - docker build -t trojshawn/multi-server ./server
+  - docker build -t trojshawn/multi-worker ./worker
+  # Log in to docker cli
+  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_ID" --password-stdin
+  # Take images and upload to docker hub
+  - docker push trojshawn/multi-client
+  - docker push trojshawn/multi-nginx
+  - docker push trojshawn/multi-server
+  - docker push trojshawn/multi-worker
