@@ -1,0 +1,19 @@
+FROM node:14.14.0-alpine
+
+# We are specifying that the USER which will execute RUN, CMD, or ENTRYPOINT
+#  instructions will be the node user, as opposed to root (default).
+USER node
+
+# We are then creating a directory of /home/node/app prior to the WORKDIR instruction. 
+# This will prevent a permissions issue since WORKDIR by default will create a
+#  directory if it does not exist and set ownership to root.
+RUN mkdir -p /home/node/app
+WORKDIR /home/node/app
+
+# The inline chown commands will set ownership of the files you are copying from
+#  your local environment to the node user in the container.
+COPY --chown=node:node ./package.json ./
+RUN npm install
+COPY --chown=node:node ./ ./
+
+CMD ["npm", "run", "start"]
