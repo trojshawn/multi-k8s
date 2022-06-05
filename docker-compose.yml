@@ -3,7 +3,6 @@ services:
   postgres:
     image: 'postgres:latest'
     environment:
-      - POSTGRES_HOST_AUTH_METHOD=trust
       - POSTGRES_PASSWORD=postgres_password
   redis:
     image: 'redis:latest'
@@ -25,13 +24,13 @@ services:
       - /home/node/app/node_modules
       - ./server:/home/node/app
     environment:
-      - REDIS_HOST=redis
-      - REDIS_PORT=6379
-      - PGUSER=postgres
-      - PGHOST=postgres
-      - PGDATABASE=postgres
-      - PGPASSWORD=postgres_password
-      - PGPORT=5432
+      - REDIS_HOST=$REDIS_HOST
+      - REDIS_PORT=$REDIS_PORT
+      - PGUSER=$PGUSER
+      - PGHOST=$PGHOST
+      - PGDATABASE=$PGDATABASE
+      - PGPASSWORD=$PGPASSWORD
+      - PGPORT=$PGPORT
   client:
     build:
       dockerfile: Dockerfile.dev
@@ -49,8 +48,8 @@ services:
       - /home/node/app/node_modules
       - ./worker:/home/node/app
     environment:
-      - REDIS_HOST=redis
-      - REDIS_PORT=6379
+      - REDIS_HOST=$REDIS_HOST
+      - REDIS_PORT=$REDIS_PORT
 
 # version: "3"
 # services:
