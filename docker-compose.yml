@@ -1,28 +1,13 @@
-version: '3'
+version: "3"
 services:
-  postgres:
-    image: 'postgres:latest'
-    environment:
-      - POSTGRES_PASSWORD=postgres_password
-  redis:
-    image: 'redis:latest'
-  nginx:
-    depends_on:
-      - api
-      - client
-    restart: always
-    build:
-      dockerfile: Dockerfile.dev
-      context: ./nginx
-    ports:
-      - '3050:80'
-  api:
-    build:
-      dockerfile: Dockerfile.dev
-      context: ./server
-    volumes:
-      - /home/node/app/node_modules
-      - ./server:/home/node/app
+  client:
+    image: "trojshawn/multi-client"
+    mem_limit: 128m
+    hostname: client
+  server:
+    image: "trojshawn/multi-server"
+    mem_limit: 128m
+    hostname: api
     environment:
       - REDIS_HOST=$REDIS_HOST
       - REDIS_PORT=$REDIS_PORT
@@ -31,54 +16,16 @@ services:
       - PGDATABASE=$PGDATABASE
       - PGPASSWORD=$PGPASSWORD
       - PGPORT=$PGPORT
-  client:
-    build:
-      dockerfile: Dockerfile.dev
-      context: ./client
-    volumes:
-      - /home/node/app/node_modules
-      - ./client:/home/node/app
-    environment:
-      - WDS_SOCKET_PORT=0
   worker:
-    build:
-      dockerfile: Dockerfile.dev
-      context: ./worker
-    volumes:
-      - /home/node/app/node_modules
-      - ./worker:/home/node/app
+    image: "trojshawn/multi-worker"
+    mem_limit: 128m
+    hostname: worker
     environment:
       - REDIS_HOST=$REDIS_HOST
       - REDIS_PORT=$REDIS_PORT
-
-# version: "3"
-# services:
-#   client:
-#     image: "cygnetops/multi-client-10-14"
-#     mem_limit: 128m
-#     hostname: client
-#   server:
-#     image: "cygnetops/multi-server-10-14"
-#     mem_limit: 128m
-#     hostname: api
-#     environment:
-#       - REDIS_HOST=$REDIS_HOST
-#       - REDIS_PORT=$REDIS_PORT
-#       - PGUSER=$PGUSER
-#       - PGHOST=$PGHOST
-#       - PGDATABASE=$PGDATABASE
-#       - PGPASSWORD=$PGPASSWORD
-#       - PGPORT=$PGPORT
-#   worker:
-#     image: "cygnetops/multi-worker-10-14"
-#     mem_limit: 128m
-#     hostname: worker
-#     environment:
-#       - REDIS_HOST=$REDIS_HOST
-#       - REDIS_PORT=$REDIS_PORT
-#   nginx:
-#     image: "cygnetops/multi-nginx-10-14"
-#     mem_limit: 128m
-#     hostname: nginx
-#     ports:
-#       - "80:80"
+  nginx:
+    image: "trojshawn/multi-nginx"
+    mem_limit: 128m
+    hostname: nginx
+    ports:
+      - "80:80"
